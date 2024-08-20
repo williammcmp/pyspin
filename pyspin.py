@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class pyspin:
     """
     A class to simulate the centrifugation process for a colloids.
@@ -30,10 +31,17 @@ class pyspin:
         _scale_check: Checks if the user input size scale is within the nanometer range.
         __str__: Returns a string representation of the centrifugation object.
     """
-    def __init__(self, size : np.array = np.linspace(5, 250, 100) * 1e-9, inital_supernate : np.array = np.ones(100), 
-                 arm_length = 1e-1, length = 1e-2,
-                 liquid_density = 997, liquid_viscosity = 1,
-                 particle_density = 2330):
+
+    def __init__(
+        self,
+        size: np.array = np.linspace(5, 250, 100) * 1e-9,
+        inital_supernate: np.array = np.ones(100),
+        arm_length=1e-1,
+        length=1e-2,
+        liquid_density=997,
+        liquid_viscosity=1,
+        particle_density=2330,
+    ):
         """
         Initializes the Centrifugation class with the given parameters.
 
@@ -47,7 +55,7 @@ class pyspin:
             particle_density (float): The density of the particles (default: 2330 kg/m^3).
         """
         self.size = size
-        self.inital_supernate= inital_supernate
+        self.inital_supernate = inital_supernate
         self.supernate = []
         self.pallets = []
         self._check_size()
@@ -55,12 +63,12 @@ class pyspin:
         self.count = len(self.size)
 
         # Centrifugation machine properties
-        self.arm_length = arm_length # length of centrifuge 10cm  (m)
-        self.length = length # tube length 1cm (m)
-        self.liquid_density = liquid_density # water (kg/m^2)
-        self.liquid_viscosity = liquid_viscosity # water (mPa.s)
-        self.particle_density = particle_density # Silicon (kg.m^2)
-        self.rpms = [] # empty list to store the rpms
+        self.arm_length = arm_length  # length of centrifuge 10cm  (m)
+        self.length = length  # tube length 1cm (m)
+        self.liquid_density = liquid_density  # water (kg/m^2)
+        self.liquid_viscosity = liquid_viscosity  # water (mPa.s)
+        self.particle_density = particle_density  # Silicon (kg.m^2)
+        self.rpms = []  # empty list to store the rpms
 
     def info(self):
         """
@@ -69,21 +77,23 @@ class pyspin:
         Returns:
             dict: details about the centrifuge and it's setup
         """
-        text = {'Colloid Info':     {
-                    'Particle Count': self.count,
-                    'Particle Radii Range (m)': [np.min(self.size), np.max(self.size)],
-                    'Average Inital Radii (m)': np.average(self.size, weights=self.inital_supernate),
-                    'Particle Density (kg/m^3)': self.particle_density,
-                    'Liquid Density (kg/m^3)': self.liquid_density,
-                    'Liquid Viscosity (Pa.s)': self.liquid_viscosity,
-                    },
-
-                'Centrifuge Info' : {
-                    'Arm Length (m)': self.arm_length,
-                    'Tube length (m)': self.length,
-                    'RPMS': self.rpms
-                    }
-                }
+        text = {
+            "Colloid Info": {
+                "Particle Count": self.count,
+                "Particle Radii Range (m)": [np.min(self.size), np.max(self.size)],
+                "Average Inital Radii (m)": np.average(
+                    self.size, weights=self.inital_supernate
+                ),
+                "Particle Density (kg/m^3)": self.particle_density,
+                "Liquid Density (kg/m^3)": self.liquid_density,
+                "Liquid Viscosity (Pa.s)": self.liquid_viscosity,
+            },
+            "Centrifuge Info": {
+                "Arm Length (m)": self.arm_length,
+                "Tube length (m)": self.length,
+                "RPMS": self.rpms,
+            },
+        }
         return text
 
     def run_cycles(self, rpms: list, duration):
@@ -95,24 +105,26 @@ class pyspin:
             duration (float or list): If a float is provided, it applies to all cycles.
                                     If a list is provided, it must be the same length as `rpms`,
                                     specifying the duration for each corresponding RPM.
-        
+
         Raises:
             ValueError: If the duration is a list and its length does not match the number of RPMs.
         """
         # Check if duration is a list or a single float
         if isinstance(duration, list):
             if len(duration) != len(rpms):
-                raise ValueError("The length of the duration list must match the number of RPMs.")
+                raise ValueError(
+                    "The length of the duration list must match the number of RPMs."
+                )
             durations = duration  # Use the list as-is
         else:
-            durations = [duration] * len(rpms)  # Repeat the single duration for each RPM
+            durations = [duration] * len(
+                rpms
+            )  # Repeat the single duration for each RPM
 
         # Run each cycle with the corresponding RPM and duration
         for rpm, dur in zip(rpms, durations):
             self.cycle(rpm, dur)
-        
-            
-    
+
     def cycle(self, rpm, duration):
         """
         Runs a single centrifugation cycle at the specified RPM and duration.
@@ -121,24 +133,26 @@ class pyspin:
             rpm (int): The RPM for this cycle.
             duration (float): The duration of the cycle in minutes.
         """
-        
+
         # Collected the most recent supernate data
         if not self.supernate:
             inital_supernate = self.inital_supernate.copy()
         else:
-            print('using previous supernate')
+            print("using previous supernate")
             inital_supernate = self.supernate[-1].copy()
 
-        supernate, pallets = self.cal_supernate_and_pallets(rpm, duration, inital_supernate)
+        supernate, pallets = self.cal_supernate_and_pallets(
+            rpm, duration, inital_supernate
+        )
 
         # Save data to state
         self.supernate.append(supernate)
         self.pallets.append(pallets)
         self.rpms.append(rpm)
 
-        print(f'Centrifuge cycle at {rpm/1000:.0f}K RPM over {duration}min completed')
+        print(f"Centrifuge cycle at {rpm/1000:.0f}K RPM over {duration}min completed")
 
-    def results(self, avg = True):
+    def results(self, avg=True):
         """
         Returns the results of the centrifugation, including average particle sizes per cycle.
 
@@ -149,20 +163,26 @@ class pyspin:
             dict: A dictionary containing the particle radii, pallets, supernates, and (optionally) average sizes per cycle.
         """
         # returns the calcuated results in a dict with average particle size per cycle (as an option)
-        results = {'Radii(nm)': self.size}
+        results = {"Radii(nm)": self.size}
         for i in range(len(self.rpms)):
             rpm = self.rpms[i]
 
-            results[f'{rpm/1000:.0f}kp'] = self.pallets[i] # pallet stats
-            results[f'{rpm/1000:.0f}ks'] = self.supernate[i] # supernate states
+            results[f"{rpm/1000:.0f}kp"] = self.pallets[i]  # pallet stats
+            results[f"{rpm/1000:.0f}ks"] = self.supernate[i]  # supernate states
 
-            if avg ==  True:
-                results[f'{rpm/1000:.0f}kp_avg'] = np.average(self.size, weights=self.pallets[i]) # avg particle size
-                results[f'{rpm/1000:.0f}ks_avg'] = np.average(self.size, weights=self.supernate[i]) # avg particle size
+            if avg == True:
+                results[f"{rpm/1000:.0f}kp_avg"] = np.average(
+                    self.size, weights=self.pallets[i]
+                )  # avg particle size
+                results[f"{rpm/1000:.0f}ks_avg"] = np.average(
+                    self.size, weights=self.supernate[i]
+                )  # avg particle size
 
         return results
 
-    def cal_supernate_and_pallets(self, rpm, duration, inital_supernate, normalise = True, size = None):
+    def cal_supernate_and_pallets(
+        self, rpm, duration, inital_supernate, normalise=True, size=None
+    ):
         """
         Calculates the remaining supernate and the resulting pallets after a centrifugation cycle.
 
@@ -179,11 +199,13 @@ class pyspin:
         # Cal sedmentaiton rates
         sed_coefficient, sed_rate = self.cal_sedimentation_rate(rpm, size)
 
-        # Calculates the remaining % of supernate 
-        supernate  = inital_supernate * ((self.length - (sed_rate * duration))/self.length)
+        # Calculates the remaining % of supernate
+        supernate = inital_supernate * (
+            (self.length - (sed_rate * duration)) / self.length
+        )
 
         # Sets all negative values to 0
-        supernate  = np.where(supernate < 0, 0, supernate)
+        supernate = np.where(supernate < 0, 0, supernate)
 
         pallets = inital_supernate - supernate
 
@@ -193,9 +215,8 @@ class pyspin:
             pallets /= np.sum(pallets)
 
         return supernate, pallets
-    
 
-    def cal_centrifuge_change(self, size, rpms, duration = 10, inital_supernate = 1):
+    def cal_centrifuge_change(self, size, rpms, duration=10, inital_supernate=1):
         """
         Simulates the change in supernate and pallets across multiple centrifugation cycles.
 
@@ -212,16 +233,18 @@ class pyspin:
 
         results = {}
         for rpm in rpms:
-            supernate, pallets = self.cal_supernate_and_pallets(rpm, time, inital_supernate, size = size)
-            results[f'{rpm:.0f}kp'] = pallets
-            results[f'{rpm:.0f}ks'] = supernate
-            
+            supernate, pallets = self.cal_supernate_and_pallets(
+                rpm, time, inital_supernate, size=size
+            )
+            results[f"{rpm:.0f}kp"] = pallets
+            results[f"{rpm:.0f}ks"] = supernate
+
             # updated the inital supernate percent start where the previous cycle ends
             inital_supernate = supernate[-1]
 
         return results
- 
-    def cal_sedimentation_rate(self, rpm, size = None):
+
+    def cal_sedimentation_rate(self, rpm, size=None):
         """
         Calculates the sedimentation coefficient and rate for the particles.
 
@@ -237,13 +260,19 @@ class pyspin:
             size = self.size
 
         # Calculates the sedimentation rate and coefficent
-        angular_velocity = rpm * 2 * np.pi # Convert RPM to rad/s
+        angular_velocity = rpm * 2 * np.pi  # Convert RPM to rad/s
 
-        sed_coefficient = ((2 * (size ** 2) * (self.particle_density - self.liquid_density)) / (9 * self.liquid_viscosity)) # s = (2r^2(ρ_s - ρ_w) / (p * liquid_viscosity)
-        sed_rate = (angular_velocity ** 2) * self.arm_length * sed_coefficient # ⍵^2 * r * s --> in cm/s
+        sed_coefficient = (
+            2 * (size**2) * (self.particle_density - self.liquid_density)
+        ) / (
+            9 * self.liquid_viscosity
+        )  # s = (2r^2(ρ_s - ρ_w) / (p * liquid_viscosity)
+        sed_rate = (
+            (angular_velocity**2) * self.arm_length * sed_coefficient
+        )  # ⍵^2 * r * s --> in cm/s
 
         return sed_coefficient, sed_rate
-    
+
     def plot_cycles(self):
         """
         Plots the supernate and pallet compositions across multiple centrifugation cycles.
@@ -261,24 +290,44 @@ class pyspin:
         Returns:
             tuple: A tuple containing the Matplotlib figure and axis objects (fig, ax).
         """
-        fig, ax = plt.subplots(figsize=(5, 6), sharex='col', sharey='row')
+        fig, ax = plt.subplots(figsize=(5, 6), sharex="col", sharey="row")
 
         # Creates a color list the size of number of particle sizes
-        colors = self.generate_color_list(self.count + 1) # +1 to allow for inital state color
+        colors = self.generate_color_list(
+            self.count + 1
+        )  # +1 to allow for inital state color
 
-
-        ax.plot(self.size * 1e9, self.inital_supernate * 1e2, label='Inital Supernate', linewidth='s', color=colors[0])
-
+        ax.plot(
+            self.size * 1e9,
+            self.inital_supernate * 1e2,
+            label="Inital Supernate",
+            linewidth="s",
+            color=colors[0],
+        )
 
         # Use the pyspin state to plot, not the results method
         # itterate through the different particle sizes
         for ii in range(self.count):
 
             # Supernate composition(%)
-            ax.plot(self.size * 1e9, self.supernate[ii] * 1e2, label=f'{self.rpms[ii]/1000:.0f}ks', linewidth=2, linestyle= '-.', color=colors[ii + 1])
+            ax.plot(
+                self.size * 1e9,
+                self.supernate[ii] * 1e2,
+                label=f"{self.rpms[ii]/1000:.0f}ks",
+                linewidth=2,
+                linestyle="-.",
+                color=colors[ii + 1],
+            )
 
             # Pallet composition(%)
-            ax.plot(self.size * 1e9, self.pallets[ii] * 1e2, label=f'{self.rpms[ii]/1000:.0f}kp', linewidth=2, linestyle= '-.', color=colors[ii + 1])
+            ax.plot(
+                self.size * 1e9,
+                self.pallets[ii] * 1e2,
+                label=f"{self.rpms[ii]/1000:.0f}kp",
+                linewidth=2,
+                linestyle="-.",
+                color=colors[ii + 1],
+            )
 
         # X-axis label
         ax.set_xlabel("Particle Radius (nm)")
@@ -288,16 +337,15 @@ class pyspin:
 
         # Shared legend below the plots
         handles, labels = ax.get_legend_handles_labels()
-        fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=2)
+        fig.legend(
+            handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.0), ncol=2
+        )
 
         plt.tight_layout(rect=[0, 0, 1, 0.95])
 
         return fig, ax
 
-
-        
-
-    def generate_color_list(self, n, cmap_name='viridis'):
+    def generate_color_list(self, n, cmap_name="viridis"):
         """
         Generates a list of n colors from a specified Matplotlib colormap.
 
@@ -311,7 +359,6 @@ class pyspin:
         cmap = plt.get_cmap(cmap_name)  # Get the colormap
         colors = [cmap(i / n) for i in range(n)]  # Generate n colors
         return colors
-    
 
     def _check_size(self):
         """
@@ -321,9 +368,10 @@ class pyspin:
             ValueError: If the size and inital_supernate arrays do not match in length.
         """
         if len(self.size) != len(self.inital_supernate):
-            raise ValueError(f'Size mismatch: Size has size ({len(self.size)}), but inital_supernate has size ({len(self.inital_supernate)})')
+            raise ValueError(
+                f"Size mismatch: Size has size ({len(self.size)}), but inital_supernate has size ({len(self.inital_supernate)})"
+            )
         return
-        
 
     def _clear_state(self):
         """
@@ -345,11 +393,15 @@ class pyspin:
         """
         # Check if the size is larger than or equal to 1 cm
         if np.any(self.size >= 1e-2):
-            raise ValueError(f"Invalid particle size found ({len(self.size[self.size >= 1e-2])}): {self.size[self.size >= 1e-2]}. Particle sizes must be smaller than 1 cm.")
-        
+            raise ValueError(
+                f"Invalid particle size found ({len(self.size[self.size >= 1e-2])}): {self.size[self.size >= 1e-2]}. Particle sizes must be smaller than 1 cm."
+            )
+
         # Check if the size is larger than or equal to 1 µm but smaller than 1 cm
         elif np.any(self.size >= 1e-6):
-            print(f"Warning: Large particle size found ({len(self.size[self.size >= 1e-6])}): {self.size[self.size >= 1e-6]}. Particles should ideally be smaller than 1 µm.")
+            print(
+                f"Warning: Large particle size found ({len(self.size[self.size >= 1e-6])}): {self.size[self.size >= 1e-6]}. Particles should ideally be smaller than 1 µm."
+            )
 
     def __str__(self):
         return str(self.info())
