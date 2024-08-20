@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 class pyspin:
     """
@@ -242,6 +243,66 @@ class pyspin:
         sed_rate = (angular_velocity ** 2) * self.arm_length * sed_coefficient # ⍵^2 * r * s --> in cm/s
 
         return sed_coefficient, sed_rate
+    
+    def plot_cycles(self):
+        """
+        Plots the supernate and pallet compositions across multiple centrifugation cycles.
+
+        This method creates a plot showing the initial supernate distribution and the resulting
+        supernate and pallet distributions after each centrifugation cycle. Each distribution is
+        plotted as a function of particle radius.
+
+        The plot uses different colors for each cycle, with an optional color list generated
+        based on the number of particle sizes.
+
+        Returns:
+            tuple: A tuple containing the Matplotlib figure and axis objects (fig, ax).
+        """
+        fig, ax = plt.subplots(figsize=(5, 6), sharex='col', sharey='row')
+
+        # Creates a color list the size of number of particle sizes
+        colors = self.generate_color_list(self.count)
+        colors_index = 0 #TODO: not happy with how this is implemented --> shouldnt need to use an index key....
+
+        ax.plot(self.size * 1e9, self.inital_supernate * 1e2, label='Inital Supernate', linewidth='s', color='purple')
+
+        results_dict = self.results(avg=False)
+        
+        for key in results_dict:
+            # TODO: the supernate and pallet plots should habe different line styles. --> use key to identfy
+            ax.plot(self.size * 1e9, results_dict[key] * 1e2, label=key, linewidth=2, color=colors[colors_index])
+
+        # X-axis label
+        ax.set_xlabel("Particle Radius (nm)")
+
+        # Y-axis labels
+        ax.set_ylabel("Composition (%)")
+
+        # Shared legend below the plots
+        handles, labels = ax.get_legend_handles_labels()
+        fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 0.0), ncol=2)
+
+        plt.tight_layout(rect=[0, 0, 1, 0.95])
+
+        return fig, ax
+
+
+        
+
+    def generate_color_list(self, n, cmap_name='viridis'):
+        """
+        Generates a list of n colors from a specified Matplotlib colormap.
+
+        Args:
+            n (int): The number of colors to generate.
+            cmap_name (str): The name of the Matplotlib colormap to use (default: 'viridis').
+
+        Returns:
+            list: A list of RGBA color tuples.
+        """
+        cmap = plt.get_cmap(cmap_name)  # Get the colormap
+        colors = [cmap(i / n) for i in range(n)]  # Generate n colors
+        return colors
     
 
     def _check_size(self):
