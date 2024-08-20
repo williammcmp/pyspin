@@ -252,8 +252,11 @@ class pyspin:
         supernate and pallet distributions after each centrifugation cycle. Each distribution is
         plotted as a function of particle radius.
 
-        The plot uses different colors for each cycle, with an optional color list generated
-        based on the number of particle sizes.
+        The plot uses different colors for each cycle, with a color list generated
+        based on the number of particle sizes plus one for the initial state.
+
+        The function iterates through the stored supernate and pallet data, directly plotting
+        them rather than using the `results` method.
 
         Returns:
             tuple: A tuple containing the Matplotlib figure and axis objects (fig, ax).
@@ -261,16 +264,21 @@ class pyspin:
         fig, ax = plt.subplots(figsize=(5, 6), sharex='col', sharey='row')
 
         # Creates a color list the size of number of particle sizes
-        colors = self.generate_color_list(self.count)
-        colors_index = 0 #TODO: not happy with how this is implemented --> shouldnt need to use an index key....
+        colors = self.generate_color_list(self.count + 1) # +1 to allow for inital state color
 
-        ax.plot(self.size * 1e9, self.inital_supernate * 1e2, label='Inital Supernate', linewidth='s', color='purple')
 
-        results_dict = self.results(avg=False)
-        
-        for key in results_dict:
-            # TODO: the supernate and pallet plots should habe different line styles. --> use key to identfy
-            ax.plot(self.size * 1e9, results_dict[key] * 1e2, label=key, linewidth=2, color=colors[colors_index])
+        ax.plot(self.size * 1e9, self.inital_supernate * 1e2, label='Inital Supernate', linewidth='s', color=colors[0])
+
+
+        # Use the pyspin state to plot, not the results method
+        # itterate through the different particle sizes
+        for ii in range(self.count):
+
+            # Supernate composition(%)
+            ax.plot(self.size * 1e9, self.supernate[ii] * 1e2, label=f'{self.rpms[ii]/1000:.0f}ks', linewidth=2, linestyle= '-.', color=colors[ii + 1])
+
+            # Pallet composition(%)
+            ax.plot(self.size * 1e9, self.pallets[ii] * 1e2, label=f'{self.rpms[ii]/1000:.0f}kp', linewidth=2, linestyle= '-.', color=colors[ii + 1])
 
         # X-axis label
         ax.set_xlabel("Particle Radius (nm)")
