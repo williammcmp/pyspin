@@ -43,8 +43,26 @@ Mohr, H., & Völkl, A. (2017). Ultracentrifugation. In eLS, John Wiley & Sons, L
 
 ---
 
-![alt text](image.png)
+![Results from centrifugation with various RPMs](image.png)
 
+---
 
 # Example
 
+```python
+# Import the module
+from pyspin import pyspin
+
+# Defining the particle size and compositions
+sizes = np.linspace(1,200, 100) * 1e-9 # radii of the NPs
+inital_sueprnate = np.ones(100) # inital supernate distributions
+
+# Initalise the pyspin object
+Spin = pyspin(sizes, inital_sueprnate)
+
+# Run the centrifuge over mulitple cycles with carious RPM
+Spin.run_cycles(rpms = [1000, 2000, 4000, 1000], duration = 10)
+
+# Returns a dict of the results from centrifugation
+results = Spin.results()
+```
