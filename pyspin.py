@@ -273,7 +273,7 @@ class pyspin:
 
         return sed_coefficient, sed_rate
 
-    def plot_cycles(self):
+    def plot_cycles(self, ax=None, fig=None):
         """
         Plots the supernate and pallet compositions across multiple centrifugation cycles.
 
@@ -290,7 +290,9 @@ class pyspin:
         Returns:
             tuple: A tuple containing the Matplotlib figure and axis objects (fig, ax).
         """
-        fig, ax = plt.subplots(figsize=(5, 6), sharex="col", sharey="row")
+        # Creates the Matplotlib fig objs if not parsed
+        if fig is None or ax is None:
+            fig, ax = plt.subplots(figsize=(5, 6),  sharex="col", sharey="row")
 
         # Creates a color list the size of number of particle sizes
         colors = self.generate_color_list(
