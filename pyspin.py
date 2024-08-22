@@ -277,6 +277,8 @@ class pyspin:
         """
         Plots the supernate and pallet compositions across multiple centrifugation cycles.
 
+        -- Its recommended the user generates plots using state or results() method --
+
         This method creates a plot showing the initial supernate distribution and the resulting
         supernate and pallet distributions after each centrifugation cycle. Each distribution is
         plotted as a function of particle radius.
@@ -290,6 +292,9 @@ class pyspin:
         Returns:
             tuple: A tuple containing the Matplotlib figure and axis objects (fig, ax).
         """
+
+        print('-- Its recommended the user generates plots using state or results() method --')
+
         # Creates the Matplotlib fig objs if not parsed
         if fig is None or ax is None:
             fig, ax = plt.subplots(figsize=(5, 6),  sharex="col", sharey="row")
