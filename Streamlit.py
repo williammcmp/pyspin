@@ -133,13 +133,19 @@ text_col, settings_col = st.columns([1,1])
 with text_col:
     st.subheader("Centrigugation with inital states.")
     st.markdown(r"""
-    Upload your concentration data of the inital state to see how the centrifugation will effect the size distribution of the colloids
+    Upload your concentration data for the inital state and see how the centrifugation will effect the size distribution of the colloids
     """)
+    # Add upload link for the file.
+
+
+    # Add download link for an example file of the concentration --> with Template.
 
 with settings_col:
 
     pass
     # where all the indivdual settings for the centrifugation can be re-0defined (multiple runs, speed and so on)
+
+    # If the settings are changed, do the files get lost? how to keep them in memory (this may not be a problem at all.) -> link to google docs? could be better
 
 # The plot the distributions after each cycles 
 # each cycle gets its own row with a col for the standard plot (see above) and the weighted mass comps (see final excel sheet)
