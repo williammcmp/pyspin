@@ -273,14 +273,14 @@ def get_df_bins(data: pd.DataFrame, interval: int = 20, bin_edges = None) -> pd.
 Centrifugation = pyspin(size=np.linspace(1,150,100) * 1e-9)
 
 with st.sidebar:
-    Centrifugation.particle_density = st.number_input(r"Density of the colloids ($$kg/m^2$$)", 500, 3000, 2330) # density of the particles used
-    Centrifugation.liquid_density = st.number_input(r"Density of liquid ($$kg/m^2$$)", 50, 3000, 997) # default density 
-    Centrifugation.liquid_viscosity = st.number_input(r"Viscosity of liquid ($$m Pa.s$$)", 0.1, 2.0, 1.0) # default density iw water at 20C
-    Centrifugation.arm_length = st.number_input(r"Centrifuge arm length ($$cm$$)", 1, 20, 10) * 1e-2
-    Centrifugation.length = st.number_input(r"Length of the container ($$cm$$)", 1, 20, 1) * 1e-2
+    Centrifugation.particle_density = 2330 # density of the particles used
+    Centrifugation.liquid_density = 997 # default density 
+    Centrifugation.liquid_viscosity = 1 # default density iw water at 20C
+    Centrifugation.arm_length = 9.5 * 1e-2 # in cm
+    Centrifugation.length = 2 * 1e-2 # in cm
 
-    duration = st.number_input(r"Duration ($$min$$)", 1, 120, 10) # Duration of Centrifugation
-    rpm = st.number_input(r"Centrifuge speed ($$RPM$$)", 1, 40000, 4000) # RPM of the centrifuge 
+    duration = 10 # Duration of Centrifugation (min)
+    rpm = 10000 # RPM of the centrifuge 
 
 time = np.linspace(0,duration,100)
 
@@ -365,20 +365,77 @@ text_col, settings_col = st.columns([1,1])
 with text_col:
     st.subheader("Centrigugation with inital states.")
     st.markdown(r"""
-    Upload your concentration data for the inital state and see how the centrifugation will effect the size distribution of the colloids
+    When using the inital concentration values experimentally measured from samples produced at 1.8W PLAL settings.
+                
+    Below is are the concentrations measured before and after the centrifugation cycles.
     """)
-    # Add upload link for the file.
+
+    data=open_data_file('src/', 'Radii (nm)', col_formatter='_')
+    data.columns = ['Radii (nm)', 'Before Centrifugation', 'After Centrifugation']
 
 
-    # Add download link for an example file of the concentration --> with Template.
+    fig, ax = plt.subplots(1, figsize=(6,5)) # Set the figure size
+    y_columns = data.columns[1:]  # Assuming first column is 'Wavelength (nm)'
+
+    for column in y_columns:
+        ax.plot(data['Radii (nm)'], np.log10(data[column]), label=column, linewidth=2)
+
+    ax.legend()
+    ax.set_ylabel("log10 [Concentration (a.u)]")
+    ax.set_xlabel("Particle Radii(nm)")
+    ax.set_title("Concentrations over centrifugation cycles")
+
+    st.pyplot(fig)
+
 
 with settings_col:
+    Centrifugation.particle_density = st.number_input(r"Density of the colloids ($$kg/m^2$$)", 500, 3000, 2330) # density of the particles used
+    Centrifugation.liquid_density = st.number_input(r"Density of liquid ($$kg/m^2$$)", 50, 3000, 997) # default density 
+    Centrifugation.liquid_viscosity = st.number_input(r"Viscosity of liquid ($$m Pa.s$$)", 0.1, 2.0, 1.0) # default density iw water at 20C
+    Centrifugation.arm_length = st.number_input(r"Centrifuge arm length ($$cm$$)", 1, 20, 10) * 1e-2
+    Centrifugation.length = st.number_input(r"Length of the container ($$cm$$)", 1, 20, 1) * 1e-2
 
-    pass
+    duration = st.number_input(r"Duration ($$min$$)", 1, 120, 10) # Duration of Centrifugation
+    rpm = st.number_input(r"Centrifuge speed ($$RPM$$)", 1, 40000, 4000) # RPM of the centrifuge 
     # where all the indivdual settings for the centrifugation can be re-0defined (multiple runs, speed and so on)
 
     # If the settings are changed, do the files get lost? how to keep them in memory (this may not be a problem at all.) -> link to google docs? could be better
 
-# The plot the distributions after each cycles 
-# each cycle gets its own row with a col for the standard plot (see above) and the weighted mass comps (see final excel sheet)
+
+st.subheader("Mass Percent Compositions")
+measured_plot_col, modelled_plot_col = st.columns([1,1])
+
+with measured_plot_col:
+    mass = get_mass_precent(data, norm_mode=None)
+
+    mass_percent = mass / mass.sum() * 100
+
+    # Need to re-estabilish the correct radii values
+    mass_percent['Radii (nm)'] = data['Radii (nm)']
+
+    bins = [20, 35, 50, 60, 70, 85, 90, 100, 110]
+
+    mass_percent_bins = get_df_bins(mass_percent, bin_edges=bins)
+
+    # Create a matplotlib figure and axis
+    fig, ax = plt.subplots()
+
+    # Plot the data on the axis
+    mass_percent_bins.plot(x='Radii (nm)', kind='bar', ax=ax)
+
+    ax.set_title("Experimental Data")
+    ax.set_xlabel("Particle Radii(nm)")
+    ax.set_ylabel("Mass Composition (%)")
+
+
+    # Display the figure in Streamlit
+    st.pyplot(fig)
+
+
+# Running the Centrigugation model
+
+
+
+
+
 
