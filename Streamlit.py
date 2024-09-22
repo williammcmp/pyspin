@@ -241,7 +241,6 @@ def get_df_bins(data: pd.DataFrame, interval: int = 20, bin_edges = None) -> pd.
         # Define the bin edges (ranges from the min to max of 'Radii (nm)' with the given interval)
         bins = np.arange(data['Radii (nm)'].min(), data['Radii (nm)'].max() + interval, interval)
     
-    print(bins)
     # Use pd.cut() to bin the 'Radii (nm)' column into intervals
     data['Bins'] = pd.cut(data['Radii (nm)'], bins=bins, right=False)
     
@@ -434,8 +433,12 @@ with measured_plot_col:
 
 # Running the Centrigugation model
 
+# -- Row 1 ---
+# plot the pallet vs supernate curves
+# Show the resultant concentration curves
 
-
+# Row 2
+# mass compositions for both experimental and modelled centrifugation
 
 
 
