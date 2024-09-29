@@ -34,13 +34,13 @@ class pyspin:
 
     def __init__(
         self,
-        size: np.array = np.linspace(5, 250, 100) * 1e-9,
-        inital_supernate: np.array = np.ones(100),
-        arm_length=1e-1,
-        length=1e-2,
-        liquid_density=997,
-        liquid_viscosity=1,
-        particle_density=2330,
+        size: np.array = np.linspace(5, 250, 100) * 1e-9, # 5-250nm -> 5e-9 - 250e-9m
+        inital_supernate: np.array = np.ones(100), # a.u
+        arm_length=1e-1, # 10cm -> 0.1
+        length=1e-2, # 1cm -> 0.01m
+        liquid_density=997, # 997kg/m^3
+        liquid_viscosity=1.5182e-3, # 1.5182mPa.s -> 0.005Pa.s at 5℃
+        particle_density=2330, #233kg/m^3
     ):
         """
         Initializes the Centrifugation class with the given parameters.
@@ -203,7 +203,7 @@ class pyspin:
 
         # Calculates the remaining % of supernate
         supernate = inital_supernate * (
-            (self.length - (sed_rate * duration)) / self.length
+            (self.length - (sed_rate * duration * 60)) / self.length
         )
 
         # Sets all negative values to 0
@@ -271,7 +271,7 @@ class pyspin:
             size = self.size
 
         # Calculates the sedimentation rate and coefficent
-        angular_velocity = rpm * 2 * np.pi  # Convert RPM to rad/s
+        angular_velocity = rpm * 2 * np.pi / 60 # Convert RPM to rad/s
 
         sed_coefficient = (
             2 * (size**2) * (self.particle_density - self.liquid_density)
