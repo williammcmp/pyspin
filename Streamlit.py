@@ -80,7 +80,7 @@ ax.set_ylabel("Palleted (%)")
 with plot_col:
     st.pyplot(fig)
 
-st.divider()
+st.header('Sedmentation Velocity')
 
 input_col, plot_col = st.columns([1,2])
 with input_col:
@@ -100,3 +100,41 @@ with plot_col:
     
     # Display the results as a table
     st.table(results_table) 
+
+with st.expander('How is sedmentation velocity calculated?'):
+    text = r"""
+    Sedimentation velocity refers to how fast particles move through a fluid under the influence of centrifugal force. This is an important concept in centrifugation, where heavier particles move outward faster than lighter ones.
+
+    According to sedimentation theory, outlined by Mohr, H., & Völkl, A. (2017) in *"Ultracentrifugation,"* the sedimentation speed can be calculated using the following formula:
+
+    $$
+    \nu = \frac{2r_s^2 (\rho_s - \rho_l)}{9\eta} F
+    $$
+
+    Here's what the terms mean:
+    - \( \nu \): Sedimentation velocity (the speed at which the particles move).
+    - \( r_s \): Radius of the particle.
+    - \( \rho_s \): Density of the particle.
+    - \( \rho_l \): Density of the liquid.
+    - \( \eta \): Viscosity of the liquid (how "thick" the liquid is).
+    - \( F \): Centrifugal force acting on the particle.
+
+    The centrifugal force \( F \) is calculated as:
+
+    $$
+    F = \omega^2 r
+    $$
+
+    Where:
+    - \( \omega \): Angular velocity (related to how fast the centrifuge is spinning).
+    - \( r \): Distance from the axis of rotation.
+
+    This equation helps us predict how quickly particles of different sizes and densities will settle during centrifugation, which is essential for understanding the results of the experiment.
+    
+    ---
+
+    Mohr, H., & Völkl, A. (2017). Ultracentrifugation. In eLS, John Wiley & Sons, Ltd (Ed.) (pp. 1-9).
+
+    ---
+    """
+    st.markdonw(text)
