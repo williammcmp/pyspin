@@ -90,12 +90,12 @@ with input_col:
 
 # Run centrifugation simulation
 sedimentation_rate = cen.cal_sedimentation_rate(rpm, particle_size * 1e-9)[1]
-time_to_sedimentation = cen.length / sedimentation_rate
+time_to_pallet = cen.length / sedimentation_rate
 
 with plot_col:
     results_table = pd.DataFrame({
-        "Parameter": ["Sedimentation Rate (m/s)", "Sedimentation Rate (m/min)", "Time to Sedimentation (min)"],
-        "Value": [f"{sedimentation_rate:.3g}", f"{sedimentation_rate / 60:.3g}", f"{time_to_sedimentation:.3g}"]
+        "Parameter": ["Sedimentation Rate (m/s)", "Sedimentation Rate (m/min)", "Time to pallet (min)"],
+        "Value": [f"{sedimentation_rate:.3g}", f"{sedimentation_rate / 60:.3g}", f"{time_to_pallet / 60:.3g}"]
     })
     
     # Display the results as a table
