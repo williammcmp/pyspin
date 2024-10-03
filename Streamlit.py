@@ -86,10 +86,10 @@ input_col, plot_col = st.columns([1,2])
 with input_col:
     # Inputs using Streamlit number input widgets
     rpm = st.number_input('(RPM)', min_value=1000, max_value=15000, value=5000, step=500)
-    duration = st.number_input('Duration (minu)', min_value=1, max_value=60, value=17)
+    particle_size = st.number_input('Particle size (nm)', min_value=1, max_value=250, value=50)
 
 # Run centrifugation simulation
-sedimentation_rate = cen.cal_sedimentation_rate(rpm, 100 * 1e-9)[1]
+sedimentation_rate = cen.cal_sedimentation_rate(rpm, particle_size * 1e-9)[1]
 time_to_sedimentation = cen.length / sedimentation_rate
 
 with plot_col:
