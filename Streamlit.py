@@ -137,4 +137,4 @@ with st.expander('How is sedmentation velocity calculated?'):
 
     ---
     """
-    st.markdonw(text)
+    st.markdown(text)
