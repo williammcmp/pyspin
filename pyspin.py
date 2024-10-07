@@ -17,6 +17,7 @@ class pyspin:
         supernate (list): List to store supernate distributions after each centrifugation cycle.
         pallets (list): List to store pallet distributions after each centrifugation cycle.
         rpms (list): List to store RPM values for each cycle.
+        times (list): List to store time values for each cycle.
 
     Methods:
         __init__: Initializes the Centrifugation class with specified parameters.
@@ -61,6 +62,7 @@ class pyspin:
         self._check_size()
         self._scale_check()
         self.count = len(self.size)
+        self.mode = 'pal'
 
         # Centrifugation machine properties
         self.arm_length = arm_length  # length of centrifuge 10cm  (m)
@@ -69,6 +71,7 @@ class pyspin:
         self.liquid_viscosity = liquid_viscosity  # water (mPa.s)
         self.particle_density = particle_density  # Silicon (kg.m^2)
         self.rpms = []  # empty list to store the rpms
+        self.times = [] # emptylist to store the times
 
     def info(self):
         """
@@ -138,8 +141,12 @@ class pyspin:
         if not self.supernate:
             inital_supernate = self.inital_supernate.copy()
         else:
-            print("using previous supernate")
-            inital_supernate = self.supernate[-1].copy()
+            if 'sup' in self.mode.lower():
+                print('Using previous supernate')
+                inital_supernate = self.supernate[-1].copy()
+            else:
+                print('Using previous Pallet')
+                inital_supernate = self.pallets[-1].copy()
 
         supernate, pallets = self.cal_supernate_and_pallets(
             rpm, duration, inital_supernate
@@ -149,6 +156,7 @@ class pyspin:
         self.supernate.append(supernate)
         self.pallets.append(pallets)
         self.rpms.append(rpm)
+        self.times.append(duration)
 
         print(f"Centrifuge cycle at {rpm/1000:.0f}K RPM over {duration}min completed")
 
@@ -183,7 +191,7 @@ class pyspin:
         return results
 
     def cal_supernate_and_pallets(
-        self, rpm, duration, inital_supernate, normalise=True, size=None
+        self, rpm, duration, inital_supernate, normalise=False, size=None
     ):
         """
         Calculates the remaining supernate and the resulting pallets after a centrifugation cycle.
