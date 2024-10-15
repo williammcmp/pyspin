@@ -19,7 +19,7 @@ with st.expander("How does the ratio of compasition over time change?"):
     The process of determining how much supernatant remains after a given amount of time during centrifugation can be described by the following equation:
 
     $$
-    P(r, t) = \frac{\text{length} - (\text{sedimentation velocity} \times \text{time})}{\text{length}}
+    P(t) = \frac{\text{length} - (\text{sedimentation velocity} \times \text{time})}{\text{length}}
     $$
 
     Where:
