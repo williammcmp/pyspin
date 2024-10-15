@@ -74,6 +74,8 @@ ax.axvline(x=100, color='gray', linestyle="--")
 first_max_index = np.where(cen.pallets[-1] == 1)[0][0]
 ax.axvline(x=cen.size[first_max_index] * 1e9, color='red', linestyle="--")
 
+fig.dpi(300)
+
 ax.set_xlabel("Radius (nm)")
 ax.set_ylabel("Palleted (%)")
 # Show the plot in Streamlit
