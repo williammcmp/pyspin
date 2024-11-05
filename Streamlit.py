@@ -12,7 +12,7 @@ from pyspin import *
 st.header("Centrifugation of Colloids")
 
 
-with st.expander("How does the ratio of compasition over time change?"):
+with st.expander("How does the ratio of composition over time change?"):
     text=r"""
     ### Determining the Amount of Supernatant Remaining Over Time
 
@@ -82,7 +82,7 @@ ax.set_ylabel("Palleted (%)")
 with plot_col:
     st.pyplot(fig)
 
-st.header('Sedmentation Velocity')
+st.header('sedimentation Velocity')
 
 input_col, plot_col = st.columns([1,2])
 with input_col:
@@ -103,7 +103,7 @@ with plot_col:
     # Display the results as a table
     st.table(results_table) 
 
-with st.expander('How is sedmentation velocity calculated?'):
+with st.expander('How is sedimentation velocity calculated?'):
     text = r"""
     Sedimentation velocity refers to how fast particles move through a fluid under the influence of centrifugal force. This is an important concept in centrifugation, where heavier particles move outward faster than lighter ones.
 
