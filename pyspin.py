@@ -320,20 +320,20 @@ class pyspin:
 
         # Creates a color list the size of number of particle sizes
         colors = self.generate_color_list(
-            self.count + 1
+            len(self.supernate) + 1
         )  # +1 to allow for inital state color
 
         ax.plot(
             self.size * 1e9,
             self.inital_supernate * 1e2,
             label="Inital Supernate",
-            linewidth="s",
+            linewidth=2,
             color=colors[0],
         )
 
         # Use the pyspin state to plot, not the results method
         # itterate through the different particle sizes
-        for ii in range(self.count):
+        for ii in range(len(self.supernate)):
 
             # Supernate composition(%)
             ax.plot(
