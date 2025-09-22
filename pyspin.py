@@ -174,7 +174,10 @@ class pyspin:
             dict: A dictionary containing the particle radii, pallets, supernates, and (optionally) average sizes per cycle.
         """
         # returns the calcuated results in a dict with average particle size per cycle (as an option)
-        results = {'Radii (nm)': self.size * 1e9} # converting size to nm scale 
+        results = {'Radii (nm)': self.size * 1e9, # converting size to nm scale 
+                   'raw': self.inital_supernate
+                   } 
+
 
         for i, rpm in enumerate(self.rpms):
             temp_name = []
