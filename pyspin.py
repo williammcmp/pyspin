@@ -62,7 +62,7 @@ class pyspin:
         self._check_size()
         self._scale_check()
         self.count = len(self.size)
-        self.mode = 'pal'
+        self.mode = 'pal' #sup or pal -> which is taken after the next centrifugation cycle
 
         self.accel_time = 20
         self.decel_time = 20
@@ -161,7 +161,7 @@ class pyspin:
         self.rpms.append(rpm)
         self.times.append(duration)
 
-        print(f"Centrifuge cycle at {rpm/1000:.0f}K RPM over {duration}min completed")
+        print(f"Centrifuge cycle at {rpm/1000:.0f}K RPM over {duration} s completed")
 
     def results(self, avg = True, supernates = False):
         """
