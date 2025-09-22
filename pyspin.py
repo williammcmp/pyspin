@@ -40,7 +40,7 @@ class pyspin:
         arm_length=1e-1, # 10cm -> 0.1
         length=1e-2, # 1cm -> 0.01m
         liquid_density=997, # 997kg/m^3
-        liquid_viscosity=1.5182e-3, # 1.5182mPa.s -> 0.005Pa.s at 5℃
+        liquid_viscosity=0.899e-3, # at 25℃
         particle_density=2330, #233kg/m^3
     ):
         """
@@ -134,7 +134,7 @@ class pyspin:
 
         Args:
             rpm (int): The RPM for this cycle.
-            duration (float): The duration of the cycle in minutes.
+            duration (float): The duration of the cycle in seconds.
         """
 
         # Collected the most recent supernate data
@@ -198,7 +198,7 @@ class pyspin:
 
         Args:
             rpm (int): The RPM of the centrifugation cycle.
-            duration (float): The duration of the cycle in minutes.
+            duration (float): The duration of the cycle in seconds.
             inital_supernate (np.array): The initial distribution of particles in the supernate.
             normalise (bool): Whether to normalise the supernate and pallets distributions (default: True).
             size (np.array, optional): An array of particle sizes. If None, uses self.size.
@@ -235,14 +235,14 @@ class pyspin:
 
         return supernate, pallets
 
-    def cal_centrifuge_change(self, size, rpms, duration=10, inital_supernate=1):
+    def cal_centrifuge_change(self, size, rpms, duration=60, inital_supernate=1):
         """
         Simulates the change in supernate and pallets across multiple centrifugation cycles.
 
         Args:
             size (np.array): An array of particle sizes.
             rpms (list): A list of RPM values for the centrifugation cycles.
-            duration (float): The duration of each cycle in minutes (default: 10 minutes).
+            duration (float): The duration of each cycle in seconds (default: 60 seconds).
             inital_supernate (float or np.array): The initial supernate percentage or distribution (default: 1, representing 100%).
 
         Returns:
@@ -285,7 +285,7 @@ class pyspin:
             2 * (size**2) * (self.particle_density - self.liquid_density)
         ) / (
             9 * self.liquid_viscosity
-        )  # s = (2r^2(ρ_s - ρ_w) / (p * liquid_viscosity)
+        )  # s = (2r^2(ρ_s - ρ_w) / (9 * liquid_viscosity)
         sed_rate = (
             (angular_velocity**2) * self.arm_length * sed_coefficient
         )  # ⍵^2 * r * s --> in cm/s
