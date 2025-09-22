@@ -64,6 +64,9 @@ class pyspin:
         self.count = len(self.size)
         self.mode = 'pal'
 
+        self.accel_time = 20
+        self.decel_time = 20
+
         # Centrifugation machine properties
         self.arm_length = arm_length  # length of centrifuge 10cm  (m)
         self.length = length  # tube length 1cm (m)
@@ -209,10 +212,25 @@ class pyspin:
         # Cal sedmentaiton rates
         sed_coefficient, sed_rate = self.cal_sedimentation_rate(rpm, size)
 
-        # Calculates the remaining % of supernate
-        supernate = inital_supernate * (
-            (self.length - (sed_rate * duration * 60)) / self.length
-        )
+        omega = rpm * 2 * np.pi / 60 
+
+        # The smallest r to be palleted based at the bottom of the centrifige container.
+        r_0 = self.arm_length * np.exp(-sed_coefficient * omega**2 * (duration - 2*(self.accel_time+self.decel_time)/3))
+
+        # the position for each size that would be palleted during centrifugation
+        pos_percent_pallet = (self.arm_length - r_0)/self.length
+
+
+        # Sets any percentage position above 1 to be = 1 
+        pos_percent_pallet = np.where(pos_percent_pallet > 1, 1, pos_percent_pallet)
+
+        supernate = inital_supernate * (1 - pos_percent_pallet)
+
+
+        # # Calculates the remaining % of supernate
+        # supernate = inital_supernate * (
+        #     (self.length - (sed_rate * duration)) / self.length
+        # )
 
         # Sets all negative values to 0
         supernate = np.where(supernate < 0, 0, supernate)
