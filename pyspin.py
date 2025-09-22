@@ -163,7 +163,7 @@ class pyspin:
 
         print(f"Centrifuge cycle at {rpm/1000:.0f}K RPM over {duration} s completed")
 
-    def results(self, avg = True, supernates = False):
+    def results(self):
         """
         Returns the results of the centrifugation, including average particle sizes per cycle.
 
@@ -175,21 +175,23 @@ class pyspin:
         """
         # returns the calcuated results in a dict with average particle size per cycle (as an option)
         results = {'Radii (nm)': self.size * 1e9} # converting size to nm scale 
-        for i in range(len(self.rpms)):
-            rpm = self.rpms[i]
 
-            results[f'{rpm/1000:.0f}kp'] = self.pallets[i] # pallet stats
-            if supernates:
-                results[f'{rpm/1000:.0f}ks'] = self.supernate[i] # supernate states
+        for i, rpm in enumerate(self.rpms):
+            temp_name = []
+            if i == 0:
+                temp_name = ""
+            
+            if i > 0:
+                suffix = self.mode[0]
+                ii = 0
+                while ii < i:
+                    temp_name.append(f'{self.rpms[ii]/1000:.0f}{suffix}')
+                    ii += 1
+                temp_name = "".join(temp_name)
 
-        # only get the last one --> simular to experimental data
-        if not supernates:
-            results[f'{rpm/1000:.0f}ks'] = self.supernate[i] # supernate states
 
-
-            if avg ==  True:
-                results[f'{rpm/1000:.0f}kp_avg'] = np.average(self.size, weights=self.pallets[i]) # avg particle size
-                results[f'{rpm/1000:.0f}ks_avg'] = np.average(self.size, weights=self.supernate[i]) # avg particle size
+            results[f'{temp_name}{rpm/1000:.0f}s'] = self.supernate[i]
+            results[f'{temp_name}{rpm/1000:.0f}p'] = self.pallets[i]
 
         return results
 
@@ -363,7 +365,7 @@ class pyspin:
                 color=colors[ii + 1],
             )
 
-            # Pallet composition(%)
+            # # Pallet composition(%)
             ax.plot(
                 self.size * 1e9,
                 self.pallets[ii] * 1e2,
