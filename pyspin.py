@@ -339,43 +339,39 @@ class pyspin:
 
         # Creates the Matplotlib fig objs if not parsed
         if fig is None or ax is None:
-            fig, ax = plt.subplots(figsize=(5, 6),  sharex="col", sharey="row")
+            fig, ax = plt.subplots(figsize=(5, 4))
+
+        # Get the results in an easier to manage formate
+        results = self.results()
 
         # Creates a color list the size of number of particle sizes
         colors = self.generate_color_list(
-            len(self.supernate) + 1
+            int((len(results.keys())+1)/2)
         )  # +1 to allow for inital state color
 
+
         ax.plot(
-            self.size * 1e9,
-            self.inital_supernate * 1e2,
-            label="Inital Supernate",
+            results['Radii (nm)'],
+            results['raw'],
+            label="Inital State",
             linewidth=2,
             color=colors[0],
         )
 
-        # Use the pyspin state to plot, not the results method
-        # itterate through the different particle sizes
-        for ii in range(len(self.supernate)):
-
-            # Supernate composition(%)
+        for i, col in enumerate(results.keys()):
+            # Skip the radii and raw columns
+            if col in ['raw', 'Radii (nm)']:
+                continue
+            
             ax.plot(
-                self.size * 1e9,
-                self.supernate[ii] * 1e2,
-                label=f"{self.rpms[ii]/1000:.0f}ks",
+                results['Radii (nm)'],
+                results[col],
+                label=col,
                 linewidth=2,
                 linestyle="-.",
-                color=colors[ii + 1],
-            )
-
-            # # Pallet composition(%)
-            ax.plot(
-                self.size * 1e9,
-                self.pallets[ii] * 1e2,
-                label=f"{self.rpms[ii]/1000:.0f}kp",
-                linewidth=2,
-                linestyle="-.",
-                color=colors[ii + 1],
+                color=colors[int(np.floor((i)/2))]
+                # np.floor((i-1)/2) turns 0,1,2,3,4,5,6, -> 0,1,1,2,2,3,3....
+                # Allows the supernate and pallet for each end of cycle to be the same color
             )
 
         # X-axis label
