@@ -219,17 +219,19 @@ class pyspin:
 
         omega = rpm * 2 * np.pi / 60 
 
+        cut_off_threshold = 0.015
+
         # The smallest r to be palleted based at the bottom of the centrifige container.
-        r_0 = self.arm_length * np.exp(-sed_coefficient * omega**2 * (duration - 2*(self.accel_time+self.decel_time)/3))
+        r_0 = (self.arm_length-cut_off_threshold) * np.exp(-sed_coefficient * omega**2 * (duration - 2*(self.accel_time+self.decel_time)/3)) * 0.9
 
         # the position for each size that would be palleted during centrifugation
-        pos_percent_pallet = (self.arm_length - r_0)/self.length
+        pos_percent_supernate = 1 * (self.arm_length - r_0 - cut_off_threshold)/(self.length - cut_off_threshold) # the 0.5 seems to be a good experimental buffer
 
 
         # Sets any percentage position above 1 to be = 1 
-        pos_percent_pallet = np.where(pos_percent_pallet > 1, 1, pos_percent_pallet)
+        pos_percent_supernate = np.where(pos_percent_supernate > 1, 1, pos_percent_supernate)
 
-        supernate = inital_supernate * (1 - pos_percent_pallet)
+        supernate = inital_supernate *(1 - (pos_percent_supernate*(cut_off_threshold/self.length)))
 
 
         # # Calculates the remaining % of supernate
@@ -335,8 +337,6 @@ class pyspin:
             tuple: A tuple containing the Matplotlib figure and axis objects (fig, ax).
         """
 
-        print('-- Its recommended the user generates plots using state or results() method --')
-
         # Creates the Matplotlib fig objs if not parsed
         if fig is None or ax is None:
             fig, ax = plt.subplots(figsize=(5, 4))
@@ -369,7 +369,7 @@ class pyspin:
                 label=col,
                 linewidth=2,
                 linestyle="-.",
-                color=colors[int(np.floor((i)/2))]
+                # color=colors[int(np.floor((i)/2))]
                 # np.floor((i-1)/2) turns 0,1,2,3,4,5,6, -> 0,1,1,2,2,3,3....
                 # Allows the supernate and pallet for each end of cycle to be the same color
             )
