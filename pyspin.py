@@ -42,6 +42,7 @@ class pyspin:
         liquid_density=997, # 997kg/m^3
         liquid_viscosity=0.899e-3, # at 25℃
         particle_density=2330, #233kg/m^3
+        cut_off = True # 1 cm
     ):
         """
         Initializes the Centrifugation class with the given parameters.
@@ -54,6 +55,7 @@ class pyspin:
             liquid_density (float): The density of the liquid (default: 997 kg/m^3).
             liquid_viscosity (float): The viscosity of the liquid (default: 1 Pa.s).
             particle_density (float): The density of the particles (default: 2330 kg/m^3).
+            cut_off (bool): Account or ignore a cut off point - Experimental considerations 
         """
         self.size = size
         self.inital_supernate = inital_supernate
@@ -66,6 +68,7 @@ class pyspin:
 
         self.accel_time = 20
         self.decel_time = 20
+        self.cut_off = cut_off
 
         # Centrifugation machine properties
         self.arm_length = arm_length  # length of centrifuge 10cm  (m)
@@ -219,20 +222,38 @@ class pyspin:
 
         omega = rpm * 2 * np.pi / 60 
 
-        cut_off_threshold = 0.015
+        if self.cut_off:
 
-        # The smallest r to be palleted based at the bottom of the centrifige container.
-        r_0 = (self.arm_length-cut_off_threshold) * np.exp(-sed_coefficient * omega**2 * (duration - 2*(self.accel_time+self.decel_time)/3)) * 0.9
+            cut_off_threshold = 0.01
 
-        # the position for each size that would be palleted during centrifugation
-        pos_percent_supernate = 1 * (self.arm_length - r_0 - cut_off_threshold)/(self.length - cut_off_threshold) # the 0.5 seems to be a good experimental buffer
+            # The smallest r-pos to be palleted based at the bottom of the centrifige container.
+            r_0 = (self.arm_length-cut_off_threshold) * np.exp(-sed_coefficient * (omega**2) * (duration - 2*(self.accel_time+self.decel_time)/3))
+
+            # the position for each size that would be palleted during centrifugation
+            pos_percent_supernate = 1 * (self.arm_length - r_0)/(self.length) # the 0.5 seems to be a good experimental buffer
 
 
-        # Sets any percentage position above 1 to be = 1 
-        pos_percent_supernate = np.where(pos_percent_supernate > 1, 1, pos_percent_supernate)
+            # Sets any percentage position above 1 to be = 1 
+            pos_percent_supernate = np.where(pos_percent_supernate > 1, 1, pos_percent_supernate)
 
-        supernate = inital_supernate *(1 - (pos_percent_supernate*(cut_off_threshold/self.length)))
+            supernate = inital_supernate *(1 - (pos_percent_supernate))
 
+        # For the case the cut off is to be ignored - Assuming the only the pallets are left behind (ideal conditions)
+        else:
+            # The smallest r-pos to be palleted based at the bottom of the centrifige container.
+            r_0 = (self.arm_length) * np.exp(-sed_coefficient * (omega**2) * (duration - 2*(self.accel_time+self.decel_time)/3))
+
+
+            # the position for each size that would be palleted during centrifugation
+            pos_percent_supernate = 1 * (self.arm_length - r_0)/(self.length) # the 0.5 seems to be a good experimental buffer
+
+
+            # Sets any percentage position above 1 to be = 1 
+            pos_percent_supernate = np.where(pos_percent_supernate > 1, 1, pos_percent_supernate)
+
+            supernate = inital_supernate *(1 - (pos_percent_supernate))
+
+            
 
         # # Calculates the remaining % of supernate
         # supernate = inital_supernate * (
